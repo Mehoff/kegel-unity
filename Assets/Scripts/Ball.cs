@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
-
     private Rigidbody rb;
-
-    private float hitForce = 500.0f;
+    private float hitForce = 2000.0f;
     private bool isThrown;
     private Vector3 force;
     void Start()
@@ -30,7 +28,7 @@ public class Ball : MonoBehaviour
 
     void Throw()
     {
-        rb.AddForce(this.force * hitForce * Time.deltaTime, ForceMode.Impulse);
-        // isThrown = true;
+        rb.AddForce(this.force * hitForce * Time.deltaTime, ForceMode.VelocityChange);
+        isThrown = true;
     }
 }
