@@ -8,6 +8,7 @@ public class Ball : MonoBehaviour
     private Rigidbody rb;
     public Slider slider;
     public Text rotationText;
+    public GameObject arrow;
     private float hitForce;
     public bool isThrown;
 
@@ -128,7 +129,8 @@ public class Ball : MonoBehaviour
 
     void UpdateRotationUI()
     {
-        rotationText.text = forceXValue.ToString("0.00");
+        arrow.transform.Rotate(0, forceXValue, 0);
+        rotationText.text = "X: " + forceXValue.ToString("0.00");
     }
 
     void Movement()
