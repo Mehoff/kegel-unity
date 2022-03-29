@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class Ball : MonoBehaviour
 {
+    public static Vector3 BASE_BALL_POSITION;
     private Rigidbody rb;
     public Slider slider;
     public GameObject arrow;
@@ -30,11 +31,17 @@ public class Ball : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        BASE_BALL_POSITION = this.transform.position;
+
         setDefaults();
     }
 
-    void setDefaults()
+    public void setDefaults()
     {
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        this.transform.position = BASE_BALL_POSITION;
+
         isThrown = false;
 
         isPositionSet = false;
@@ -65,13 +72,11 @@ public class Ball : MonoBehaviour
         if (!isPositionSet)
         {
             setIsPositionSet(true);
-            Debug.Log("Position set");
             return;
         }
         else if (!isPowerSet)
         {
             setIsPowerSet(true);
-            Debug.Log("Power set");
             return;
         }
 
@@ -145,5 +150,7 @@ public class Ball : MonoBehaviour
         this.force.Set(forceXValue, 0, 1);
         rb.AddForce(this.force * hitForce * Time.deltaTime, ForceMode.VelocityChange);
         isThrown = true;
+
+        Invoke("setDefaults", 5);
     }
 }
