@@ -6,7 +6,6 @@ public class Kegel : MonoBehaviour
 {
     private Rigidbody rb;
     public bool isStanding;
-
     public float rX;
     public float rZ;
 
@@ -26,7 +25,7 @@ public class Kegel : MonoBehaviour
             if ((rX >= 70f && rX <= 270f) || (rZ >= 70f && rZ <= 270f))
             {
                 isStanding = false;
-                Destroy(this.gameObject, 3);
+                GameManager.Instance.OnKegelFall(this.gameObject);
             }
         }
     }

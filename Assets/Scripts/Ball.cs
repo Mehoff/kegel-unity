@@ -10,21 +10,18 @@ public class Ball : MonoBehaviour
     public Slider slider;
     public GameObject arrow;
     private float hitForce;
-    public bool isThrown;
 
     // Право-лево
     private const float MIX_POSITION_X = -1f;
     private const float MAX_POSITION_X = 1f;
     public const float POSITION_CHANGE_INDEX = 0.05f;
     public float postitionChangeIndex;
-    public bool isPositionSet;
 
     // Сила удара
     private const float POWER_CHANGE_INDEX = 50f;
     private const float MAX_POWER = 3000f;
     private const float MIN_POWER = 1000F;
     public float powerChangeIndex = 50f;
-    public bool isPowerSet;
     private float forceXValue;
     private Vector3 force;
 
@@ -42,12 +39,9 @@ public class Ball : MonoBehaviour
         rb.angularVelocity = Vector3.zero;
         this.transform.position = BASE_BALL_POSITION;
 
-        isThrown = false;
+        GameManager.Instance.ChangeState(GameState.ChooseThrowDirection);
 
-        isPositionSet = false;
         postitionChangeIndex = POSITION_CHANGE_INDEX;
-
-        isPowerSet = false;
         powerChangeIndex = POWER_CHANGE_INDEX;
 
         hitForce = MIN_POWER;
@@ -56,30 +50,18 @@ public class Ball : MonoBehaviour
 
     }
 
-    void setIsPositionSet(bool value)
-    {
-        isPositionSet = value;
-    }
-
-    void setIsPowerSet(bool value)
-    {
-        isPowerSet = value;
-    }
-
     void handleSubmit()
     {
-        Debug.Log("Handle submit");
-        if (!isPositionSet)
-        {
-            setIsPositionSet(true);
-            return;
-        }
-        else if (!isPowerSet)
-        {
-            setIsPowerSet(true);
-            return;
-        }
+        GameState state = GameManager.Instance.GetState();
 
+        if (state == GameState.ChooseThrowDirection)
+        {
+            GameManager.Instance.ChangeState(GameState.ChooseThrowPower);
+        }
+        else if (state == GameState.ChooseThrowPower)
+        {
+            Throw();
+        }
     }
 
     void Update()
@@ -89,9 +71,10 @@ public class Ball : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!isThrown)
+        GameState state = GameManager.Instance.GetState();
+        if (state != GameState.BallThrown)
         {
-            if (!isPositionSet)
+            if (state == GameState.ChooseThrowDirection)
             {
                 if (forceXValue >= MAX_POSITION_X)
                 {
@@ -106,7 +89,7 @@ public class Ball : MonoBehaviour
                 UpdateRotationUI();
                 return;
             }
-            else if (!isPowerSet)
+            else if (state == GameState.ChooseThrowPower)
             {
                 if (hitForce >= MAX_POWER)
                 {
@@ -122,7 +105,6 @@ public class Ball : MonoBehaviour
                 UpdateForceUI();
                 return;
             }
-            Throw();
         }
     }
 
@@ -139,7 +121,7 @@ public class Ball : MonoBehaviour
 
     void Movement()
     {
-        if (Input.GetKeyDown(KeyCode.Return) && !isThrown)
+        if (Input.GetKeyDown(KeyCode.Return) && GameManager.Instance.GetState() != GameState.BallThrown)
         {
             handleSubmit();
         }
@@ -148,8 +130,11 @@ public class Ball : MonoBehaviour
     void Throw()
     {
         this.force.Set(forceXValue, 0, 1);
-        rb.AddForce(this.force * hitForce * Time.deltaTime, ForceMode.VelocityChange);
-        isThrown = true;
+
+        rb.AddForce(this.force * (hitForce * 5.0f) * Time.deltaTime, ForceMode.Impulse);
+
+        GameManager.Instance.ChangeState(GameState.BallThrown);
+        GameManager.Instance.IncrementThrowsCount();
 
         Invoke("setDefaults", 5);
     }

@@ -1,49 +1,125 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    private const int BASE_POINTS = 500;
-    private static int throwsCount;
-    private static int kegelsStandingCount;
-    private static int score;
+    public static GameManager Instance;
 
-    private static List<Kegel> kegelsToDelete;
+    public event Action onGameStateChange;
+
+    private GameStats stats;
+
+    public Text statsText;
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    private GameState _state;
+
+    private static List<GameObject> kegelsToDelete;
 
     void Start()
     {
+        kegelsToDelete = new List<GameObject>();
+        ChangeState(GameState.ChooseThrowDirection);
         Setup();
-    }
-
-
-    public void onThrow()
-    {
-
     }
 
     void Setup()
     {
+        stats = new GameStats();
+    }
+
+    public void IncrementThrowsCount()
+    {
+        this.stats.IncrementThrowsCount();
+        this.UpdateStatsUI();
+    }
+
+    public GameState GetState()
+    {
+        return _state;
+    }
+
+    public void ChangeState(GameState newState)
+    {
+        _state = newState;
+        onGameStateChange?.Invoke();
+    }
+
+    public void Reset()
+    {
+        SceneManager.SetActiveScene(SceneManager.GetActiveScene());
+    }
+
+    public void OnKegelFall(GameObject kegel)
+    {
+        Destroy(kegel, 3);
+        stats.KegelFall();
+        UpdateStatsUI();
+        if (this.stats.IsWin())
+        {
+            Invoke("Reset", 5);
+        }
+    }
+
+    public void UpdateStatsUI()
+    {
+        statsText.text = stats.ToString();
+    }
+}
+
+
+public enum GameState
+{
+    ChooseThrowDirection,
+    ChooseThrowPower,
+    BallThrown,
+}
+
+public class GameStats
+{
+    private const int BASE_POINTS = 500;
+
+    private int throwsCount;
+    private int kegelsFallenCount;
+    private int score;
+
+    public GameStats()
+    {
+        Reset();
+    }
+
+    public void Reset()
+    {
         throwsCount = 0;
-        kegelsStandingCount = 10;
+        kegelsFallenCount = 0;
         score = 0;
     }
 
-    public static void OnKegelFall(Kegel kegel)
+    public void IncrementThrowsCount()
     {
-        kegelsStandingCount -= 1;
-        kegelsToDelete.Add(kegel);
+        throwsCount++;
+    }
+
+    public void KegelFall()
+    {
+        kegelsFallenCount++;
         score += BASE_POINTS / throwsCount;
     }
 
-    private static void DeleteKegels()
+    public bool IsWin()
     {
-        foreach (var k in kegelsToDelete)
-            Destroy(k);
+        return this.kegelsFallenCount == 10;
     }
 
-    public static void SetupNewThrow()
+    public override string ToString()
     {
-        DeleteKegels();
+        return $"Score: {score}\nThrows: {throwsCount}\nKegels fallen: {kegelsFallenCount}";
     }
 }
