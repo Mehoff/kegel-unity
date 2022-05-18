@@ -10,7 +10,6 @@ public enum MenuState
 
 public class MenuManager : MonoBehaviour
 {
-
     private MenuState state;
     public GameObject UI;
     public GameObject MenuBackground;

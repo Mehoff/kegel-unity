@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    // REF TO CANVASES
+    public GameObject winScreen;
+
     public static GameManager Instance;
 
     public event Action onGameStateChange;
@@ -25,6 +28,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        winScreen.SetActive(false);
         kegelsToDelete = new List<GameObject>();
         ChangeState(GameState.ChooseThrowDirection);
         Setup();
@@ -54,7 +58,7 @@ public class GameManager : MonoBehaviour
 
     public void Reset()
     {
-        SceneManager.SetActiveScene(SceneManager.GetActiveScene());
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void OnKegelFall(GameObject kegel)
@@ -64,6 +68,7 @@ public class GameManager : MonoBehaviour
         UpdateStatsUI();
         if (this.stats.IsWin())
         {
+            ShowWinScreen();
             Invoke("Reset", 5);
         }
     }
@@ -71,6 +76,11 @@ public class GameManager : MonoBehaviour
     public void UpdateStatsUI()
     {
         statsText.text = stats.ToString();
+    }
+
+    public void ShowWinScreen()
+    {
+        winScreen.SetActive(true);
     }
 }
 
