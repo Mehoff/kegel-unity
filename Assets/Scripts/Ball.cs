@@ -10,6 +10,7 @@ public class Ball : MonoBehaviour
     public Slider slider;
     public GameObject arrow;
     private float hitForce;
+    private AudioSource ballSound;
 
     // Право-лево
     private const float MIX_POSITION_X = -1f;
@@ -28,6 +29,7 @@ public class Ball : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        ballSound = GetComponent<AudioSource>();
         BASE_BALL_POSITION = this.transform.position;
 
         setDefaults();
@@ -135,6 +137,8 @@ public class Ball : MonoBehaviour
 
         GameManager.Instance.ChangeState(GameState.BallThrown);
         GameManager.Instance.IncrementThrowsCount();
+
+        ballSound.Play();
 
         Invoke("setDefaults", 5);
     }

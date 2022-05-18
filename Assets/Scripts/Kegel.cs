@@ -6,6 +6,8 @@ public class Kegel : MonoBehaviour
 {
     private Rigidbody rb;
     public bool isStanding;
+
+    private AudioSource hitAudioSource;
     public float rX;
     public float rZ;
 
@@ -13,6 +15,13 @@ public class Kegel : MonoBehaviour
     {
         isStanding = true;
         rb = GetComponent<Rigidbody>();
+        hitAudioSource = GetComponent<AudioSource>();
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.name == "Ball")
+            hitAudioSource.Play();
     }
 
     void Update()
