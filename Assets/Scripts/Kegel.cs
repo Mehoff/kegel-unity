@@ -20,8 +20,7 @@ public class Kegel : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        if (other.gameObject.name == "Ball")
-            hitAudioSource.Play();
+        hitAudioSource.Play();
     }
 
     void Update()
